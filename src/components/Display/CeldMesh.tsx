@@ -1,21 +1,29 @@
 import { useEffect, useMemo, useRef } from "react";
 import { CeldVertexShader, CeldFragmentShader } from "../../shaders/CeldShader";
-import { CeldProps } from "./CeldProps";
-import { useAppSelector } from "../../hooks/redux";
+
 import { Color, ShaderMaterial, Vector4 } from "three";
 
-export const CeldMesh = ({ position, idx, celdSize }: CeldProps) => {
-  const {
-    showBackground,
-    backgroundColorsHEX: backgroundColors,
-    gridColorData,
-    layerIdx,
-  } = useAppSelector((state) => state.editor);
+interface CeldProps {
+  celdSize: number;
+  celdPos: [number, number];
+  position: [number, number, number];
+  backgroundColors: [Color, Color];
+  idx: number;
+  color: Color;
+  showBackground: boolean;
+  opacity: number;
+}
 
+export const CeldMesh = ({
+  position,
+  idx,
+  celdSize,
+  color,
+  backgroundColors,
+  showBackground,
+  opacity,
+}: CeldProps) => {
   const ref = useRef<ShaderMaterial>(null);
-
-  const { colorHEX, opacity } = gridColorData[layerIdx][idx];
-  const color = new Color(colorHEX);
 
   const uniforms = useMemo(
     () => ({
@@ -29,12 +37,10 @@ export const CeldMesh = ({ position, idx, celdSize }: CeldProps) => {
         value: showBackground,
       },
     }),
-    [backgroundColors, color.b, color.g, color.r, opacity, showBackground]
+    [backgroundColors, color.b, color.g, color.r, showBackground, opacity]
   );
 
   useEffect(() => {
-    const { colorHEX, opacity } = gridColorData[layerIdx][idx];
-    const color = new Color(colorHEX);
     if (ref.current) {
       ref.current.uniforms.u_color.value = new Vector4(
         color.r,
@@ -46,7 +52,7 @@ export const CeldMesh = ({ position, idx, celdSize }: CeldProps) => {
         (item) => new Color(item)
       );
     }
-  }, [gridColorData, idx, backgroundColors, layerIdx]);
+  }, [idx, backgroundColors, color.r, color.g, color.b, opacity]);
 
   return (
     <mesh position={position} name={"" + idx}>

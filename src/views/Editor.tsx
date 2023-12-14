@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { Display } from "../components/Display/Display";
 import { TimeLine } from "../components/TimeLine/TimeLine";
 import { ColorPalete } from "../theme/Colors";
+import { Display } from "../components/Display/Display";
 
 const StyledEditor = styled.section`
   display: grid;

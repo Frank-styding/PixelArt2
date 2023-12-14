@@ -1,15 +1,9 @@
-import { useRef, useState } from "react";
-import { PlayIcon } from "../icons/PlayIcon";
-import { StopIcon } from "../icons/StopIcon";
 import styled from "styled-components";
-import { StyledControls } from "./StyledControls";
-import { StyledControlTime } from "./StyledControlTime";
-import { StyledButton } from "./StyledButton";
-import { StyledLayersScrollContainer } from "./StyledLayersScrollContainer";
-import { StyledLayersContainer } from "./StyledLayersContainer";
-import { StyledLayerContainer } from "./StyledLayerContainer";
-import { StyledPreviewContainer } from "./StyledPreviewContainer";
-import { StyledLayerNumber } from "./StyledLayerNumber";
+import { Controls } from "./Controls";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { GridProvider } from "./GridProvider";
+import { GridItem } from "./GridItem";
 
 const StyledTimeLine = styled.div`
   width: 100%;
@@ -19,54 +13,59 @@ const StyledTimeLine = styled.div`
   grid-template-rows: 40px auto;
 `;
 
-export const Layer = ({
-  idx,
-  activeLayer,
-  onClick,
-}: {
-  idx: number;
-  activeLayer: number;
-  onClick: () => void;
-}) => {
-  const ref = useRef(null);
+const StyledLayersContainer = styled.div`
+  min-width: 100%;
+  height: 100%;
+`;
+
+const GridContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+`;
+
+const LayersContainer = () => {
+  const [layers] = useState([
+    {
+      name: "0",
+    },
+    {
+      name: "1",
+    },
+    {
+      name: "2",
+    },
+    {
+      name: "3",
+    },
+    {
+      name: "4",
+    },
+    {
+      name: "5",
+    },
+  ]);
+
   return (
-    <StyledLayerContainer
-      selected={activeLayer == idx}
-      onClick={() => onClick()}
-      key={idx}
-    >
-      <StyledPreviewContainer />
-      <StyledLayerNumber>{idx}</StyledLayerNumber>
-    </StyledLayerContainer>
+    <StyledLayersContainer>
+      <GridProvider itemWidth={250}>
+        <GridContainer>
+          {layers.map(({ name }) => (
+            <GridItem name={name} key={uuidv4()}>
+              {name}
+            </GridItem>
+          ))}
+        </GridContainer>
+      </GridProvider>
+    </StyledLayersContainer>
   );
 };
 
 export const TimeLine = () => {
-  const [play, setPlay] = useState(true);
-  const [activeLayer, setActiveLayer] = useState(0);
-
-  const onClick = (idx: number) => {
-    setActiveLayer(idx);
-  };
-
-  const layers = new Array(2)
-    .fill(null)
-    .map((_, idx) => (
-      <Layer activeLayer={activeLayer} idx={idx} onClick={() => onClick(idx)} />
-    ));
-
   return (
     <StyledTimeLine>
-      <StyledControls>
-        <StyledControlTime>
-          <StyledButton onClick={() => setPlay(!play)}>
-            {play ? <PlayIcon size={15} /> : <StopIcon size={15} />}
-          </StyledButton>
-        </StyledControlTime>
-      </StyledControls>
-      <StyledLayersScrollContainer>
-        <StyledLayersContainer>{layers}</StyledLayersContainer>
-      </StyledLayersScrollContainer>
+      <Controls />
+      <LayersContainer />
     </StyledTimeLine>
   );
 };

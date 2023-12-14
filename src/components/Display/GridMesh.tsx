@@ -1,20 +1,34 @@
-import { CeldMesh } from "./CeldMesh";
-import { Line } from "@react-three/drei";
-import { Vector3 } from "three";
-import { useAppSelector } from "../../hooks/redux";
 import { useThree } from "@react-three/fiber";
+import { GridLines } from "./gridLinesMesh";
+import { CeldMesh } from "./CeldMesh";
+import { Color } from "three";
+
+interface GridMeshProps {
+  scale: number;
+  position: [number, number, number];
+  gridDim: [number, number];
+  lineColor: number;
+  lineWidth: number;
+  showGrid?: boolean;
+  showBackground?: boolean;
+  backgroundColors: [number, number];
+  gridData: {
+    color: number;
+    opacity: number;
+  }[];
+}
 
 export const GridMesh = ({
-  location,
   scale,
-}: {
-  location: [number, number, number];
-  scale: number;
-}) => {
-  const { lineColorHEX, lineWidth, gridDim } = useAppSelector(
-    (state) => state.editor
-  );
-
+  position,
+  gridDim,
+  lineColor,
+  lineWidth,
+  backgroundColors,
+  gridData,
+  showGrid = true,
+  showBackground = true,
+}: GridMeshProps) => {
   const { size } = useThree();
 
   const celdSize =
@@ -25,9 +39,10 @@ export const GridMesh = ({
   const height = gridDim[1] * celdSize;
 
   const celds = [];
-  const lines = [];
+
   for (let i = 0; i < gridDim[0]; i++) {
     for (let j = 0; j < gridDim[1]; j++) {
+      const { color, opacity } = gridData[i + j * gridDim[0]];
       celds.push(
         <CeldMesh
           key={i + j * gridDim[0]}
@@ -39,41 +54,31 @@ export const GridMesh = ({
           ]}
           celdSize={celdSize}
           celdPos={[i, j]}
+          backgroundColors={[
+            new Color(backgroundColors[0]),
+            new Color(backgroundColors[1]),
+          ]}
+          showBackground={showBackground}
+          color={new Color(color)}
+          opacity={opacity}
         />
       );
     }
   }
-  for (let j = 0; j <= gridDim[1]; j++) {
-    lines.push(
-      <Line
-        key={"y" + j}
-        points={[
-          new Vector3(-width / 2, -height / 2 + celdSize * j, 0),
-          new Vector3(width / 2, -height / 2 + celdSize * j, 0),
-        ]}
-        color={lineColorHEX}
-        lineWidth={lineWidth}
-      />
-    );
-  }
-  for (let i = 0; i <= gridDim[0]; i++) {
-    lines.push(
-      <Line
-        key={"x" + i}
-        points={[
-          new Vector3(-width / 2 + celdSize * i, height / 2, 0),
-          new Vector3(-width / 2 + celdSize * i, -height / 2, 0),
-        ]}
-        color={lineColorHEX}
-        lineWidth={lineWidth}
-      />
-    );
-  }
 
   return (
-    <mesh position={location} scale={scale}>
+    <mesh position={position} scale={scale}>
       {celds}
-      {lines}
+      {showGrid && (
+        <GridLines
+          gridDim={gridDim}
+          lineColor={new Color(lineColor)}
+          lineWidth={lineWidth}
+          width={width}
+          height={height}
+          celdSize={celdSize}
+        />
+      )}
     </mesh>
   );
 };
