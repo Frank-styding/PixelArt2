@@ -68,7 +68,7 @@ export const Display = () => {
           <GridMesh
             gridDim={[16, 16]}
             lineColor={lineColor}
-            gridData={layers[activeLayer]}
+            gridData={layers[activeLayer].data}
             lineWidth={1}
             backgroundColors={backgroundColors}
             scale={transform.scale}

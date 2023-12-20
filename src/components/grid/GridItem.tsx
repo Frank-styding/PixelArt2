@@ -10,12 +10,15 @@ export const GridItem = ({ children }: { children: ReactNode }) => {
   const { itemWidth, onDown, onUp, onMove, gap, intermediateElement } =
     useContext(GridContext);
 
-  const [styles, set] = useSpring(() => ({
-    xy: [left, top],
-    immediate: true,
-    scale: 1,
-    zIndex: 0,
-  }));
+  const [styles, set] = useSpring(() => {
+    console.log(traveler);
+    return {
+      xy: [left, top],
+      immediate: true,
+      scale: 1,
+      zIndex: 0,
+    };
+  });
 
   useMouse({
     onLeftDrag(_, delta) {

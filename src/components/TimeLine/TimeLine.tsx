@@ -1,12 +1,13 @@
 import styled from "styled-components";
 import { Controls } from "./Controls";
 import { GridProvider } from "../grid/GridProvider";
-import { useContext, useState } from "react";
-import { swap } from "../grid/swap";
+import { ReactNode, useContext, useState } from "react";
 import { ColorPalete, Fonts } from "../../theme/Theme";
 import { GridItemContext } from "../grid/GridItemContext";
 import { GridItem } from "../grid/GridItem";
 import { useSpring, animated } from "@react-spring/web";
+import { v4 as uuid } from "uuid";
+import { swap } from "../grid/swap";
 
 const StyledTimeLine = styled.div`
   width: 100%;
@@ -40,8 +41,8 @@ const StyledLayerName = styled.div`
   font-family: ${Fonts.roboto};
   font-size: ${Fonts.fontSize[3]};
 `;
-const LayerName = () => {
-  return <StyledLayerName>Hola</StyledLayerName>;
+const LayerName = ({ children }: { children: ReactNode }) => {
+  return <StyledLayerName>{children}</StyledLayerName>;
 };
 
 const LayerContainer = styled.div`
@@ -63,12 +64,12 @@ const StyledLayer = styled.div<{ active: boolean }>`
     porps.active ? ColorPalete.dark.dark0 : "none"};
 `;
 
-const Layer = () => {
+const Layer = ({ name }: { name: string }) => {
   const { isTraveler } = useContext(GridItemContext);
   return (
     <StyledLayer active={isTraveler}>
       <LayerPreView />
-      <LayerName />
+      <LayerName>{name}</LayerName>
     </StyledLayer>
   );
 };
@@ -80,15 +81,19 @@ const AddButtonContainer = styled.div`
   place-content: center;
 `;
 
-const AddButton = () => {
+const AddButton = ({ onClick }: { onClick: (idx: number) => void }) => {
+  const { traveler } = useContext(GridItemContext);
+
   const [style, set] = useSpring(() => ({
     opacity: 0,
     config: { duration: 100 },
   }));
   const { idx } = useContext(GridItemContext);
 
-  const onClick = () => {
-    console.log(idx);
+  const _onClick = () => {
+    if (traveler == null) {
+      onClick(idx);
+    }
   };
 
   return (
@@ -97,7 +102,7 @@ const AddButton = () => {
       onMouseLeave={() => set({ opacity: 0 })}
     >
       <animated.div
-        onClick={onClick}
+        onClick={_onClick}
         style={{
           width: "30px",
           height: "30px",
@@ -113,31 +118,34 @@ const AddButton = () => {
 const LayersContainer = () => {
   const [layers, setLayers] = useState([
     {
-      name: "0",
+      name: "hola",
+      id: uuid(),
     },
     {
-      name: "1",
+      name: "hola1",
+      id: uuid(),
     },
     {
-      name: "2",
-    },
-    {
-      name: "3",
-    },
-    {
-      name: "4",
-    },
-    {
-      name: "5",
+      name: "hola2",
+      id: uuid(),
     },
   ]);
+
+  const onClickAdd = (idx: number) => {
+    const n_list = layers.slice();
+    n_list.splice(idx, 0, {
+      name: "hola3",
+      id: uuid(),
+    });
+    setLayers(n_list);
+  };
 
   return (
     <StyledLayersContainer>
       <GridProvider
         itemWidth={240}
         intermediateElement={{
-          element: () => <AddButton />,
+          element: () => <AddButton onClick={onClickAdd} />,
           width: 25,
           onHover: {
             width: 35,
@@ -145,14 +153,14 @@ const LayersContainer = () => {
           },
         }}
         onChange={(idx, targetIdx) => {
-          const newList = swap(layers, idx, targetIdx);
-          setLayers(newList);
+          const n_list = swap(layers, idx, targetIdx);
+          setLayers(n_list);
         }}
       >
-        {layers.map(({ name }) => (
-          <GridItem key={name}>
+        {layers.map(({ name, id }) => (
+          <GridItem key={id}>
             <LayerContainer>
-              <Layer />
+              <Layer name={name} />
             </LayerContainer>
           </GridItem>
         ))}

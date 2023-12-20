@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 type Layer = {
-  color: number;
-  opacity: number;
-}[];
+  data: {
+    color: number;
+    opacity: number;
+  }[];
+
+  name: string;
+};
 
 interface EditorState {
   lineColor: number;
@@ -24,7 +28,30 @@ const initialState: EditorState = {
   showBackground: true,
   showGrid: true,
   layers: [
-    new Array(16 * 16).fill(null).map(() => ({ color: 0xff0000, opacity: 0 })),
+    {
+      data: new Array(16 * 16)
+        .fill(null)
+        .map(() => ({ color: 0xff0000, opacity: 0 })),
+      name: "0",
+    },
+    {
+      data: new Array(16 * 16)
+        .fill(null)
+        .map(() => ({ color: 0xff0000, opacity: 0 })),
+      name: "1",
+    },
+    {
+      data: new Array(16 * 16)
+        .fill(null)
+        .map(() => ({ color: 0xff0000, opacity: 0 })),
+      name: "2",
+    },
+    {
+      data: new Array(16 * 16)
+        .fill(null)
+        .map(() => ({ color: 0xff0000, opacity: 0 })),
+      name: "3",
+    },
   ],
   activeLayer: 0,
 };
@@ -45,9 +72,12 @@ export const EditorSlice = createSlice({
     setGridDim: (state, action) => {
       state.gridDim = action.payload;
       state.layers = [
-        new Array(state.gridDim[0] * state.gridDim[1])
-          .fill(null)
-          .map(() => ({ color: 0x000000, opacity: 0 })),
+        {
+          data: new Array(state.gridDim[0] * state.gridDim[1])
+            .fill(null)
+            .map(() => ({ color: 0x000000, opacity: 0 })),
+          name: "0",
+        },
       ];
     },
     showGrid: (state) => {
@@ -63,13 +93,36 @@ export const EditorSlice = createSlice({
       state.showBackground = false;
     },
     setCeldColor: (state, action) => {
-      state.layers[state.activeLayer][action.payload.idx].color =
+      state.layers[state.activeLayer].data[action.payload.idx].color =
         action.payload.color;
-      state.layers[state.activeLayer][action.payload.idx].opacity =
+      state.layers[state.activeLayer].data[action.payload.idx].opacity =
         action.payload.opacity;
     },
     setActiveLayer: (state, action) => {
       state.activeLayer = action.payload.activeLayer;
+    },
+    addLayer: (state, action) => {
+      const n_layer = {
+        name: action.payload.name,
+        data: new Array(state.gridDim[0] * state.gridDim[1])
+          .fill(null)
+          .map(() => ({ color: 0x000000, opacity: 0 })),
+      };
+
+      if (action.payload.idx == undefined) {
+        state.layers.push(n_layer);
+      } else {
+        state.layers.splice(action.payload.idx, 0, n_layer);
+      }
+    },
+
+    swapLayer: (state, action) => {
+      const { idx, targetIdx } = action.payload;
+      const _list = [...state.layers];
+      const item = _list[idx];
+      _list.splice(idx, 1);
+      _list.splice(targetIdx, 0, item);
+      state.layers = _list;
     },
   },
 });
@@ -84,6 +137,8 @@ export const {
   hideGrid,
   setCeldColor,
   setActiveLayer,
+  addLayer,
+  swapLayer,
 } = EditorSlice.actions;
 
 export default EditorSlice.reducer;
