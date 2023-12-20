@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { TimeLine } from "../components/TimeLine/TimeLine";
-import { ColorPalete } from "../theme/Colors";
+import { ColorPalete } from "../theme/Theme";
 import { Display } from "../components/Display/Display";
 
 const StyledEditor = styled.section`

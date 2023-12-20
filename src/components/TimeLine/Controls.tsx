@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ColorPalete } from "../../theme/Colors";
+import { ColorPalete } from "../../theme/Theme";
 import { TimeControl } from "./TimeControl";
 
 export const StyledControls = styled.div`

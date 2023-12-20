@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ColorPalete } from "../../theme/Colors";
+import { ColorPalete } from "../../theme/Theme";
 import { PlayIcon } from "../icons/PlayIcon";
 import { useState } from "react";
 import { StopIcon } from "../icons/StopIcon";

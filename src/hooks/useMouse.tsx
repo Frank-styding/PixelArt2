@@ -68,11 +68,11 @@ export const useMouse = ({
         mouse.wheelIsDown = true;
         if (onWheelDown) onWheelDown(mouse);
       }
-      if (e.button == 2) {
+      if (e.button == 0) {
         mouse.leftIsDown = true;
         if (onLeftDown) onLeftDown(mouse);
       }
-      if (e.button == 0) {
+      if (e.button == 1) {
         mouse.rightIsDown = true;
         if (onRightDown) onRightDown(mouse);
       }
@@ -118,11 +118,11 @@ export const useMouse = ({
         mouse.wheelIsDown = false;
         if (onWheelUp) onWheelUp(mouse);
       }
-      if (e.button == 2) {
+      if (e.button == 0) {
         mouse.leftIsDown = false;
         if (onLeftUp) onLeftUp(mouse);
       }
-      if (e.button == 0) {
+      if (e.button == 1) {
         mouse.rightIsDown = false;
         if (onRightUp) onRightUp(mouse);
       }
@@ -140,7 +140,7 @@ export const useMouse = ({
     element.addEventListener("mousedown", mosueDown);
     element.addEventListener("pointermove", mouseMove);
     element.addEventListener("mouseup", mouseUp);
-    element.addEventListener("wheel", wheel);
+    element.addEventListener("wheel", wheel, { passive: true });
     return () => {
       element.removeEventListener("mousedown", mosueDown);
       element.removeEventListener("pointermove", mouseMove);
