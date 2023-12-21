@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-type Layer = {
+export type Layer = {
   data: {
     color: number;
     opacity: number;

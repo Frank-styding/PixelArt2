@@ -7,11 +7,19 @@ import { GridItemContext } from "./GridItemContext";
 export const GridItem = ({ children }: { children: ReactNode }) => {
   const { traveler, left, top, id, idx, isTraveler } =
     useContext(GridItemContext);
-  const { itemWidth, onDown, onUp, onMove, gap, intermediateElement } =
-    useContext(GridContext);
+
+  const {
+    itemWidth,
+    onDown,
+    onUp,
+    onMove,
+    gap,
+    intermediateElementInitialWidth,
+  } = useContext(GridContext);
+
+  const iternInitialWidth = intermediateElementInitialWidth || 0;
 
   const [styles, set] = useSpring(() => {
-    console.log(traveler);
     return {
       xy: [left, top],
       immediate: true,
@@ -24,13 +32,12 @@ export const GridItem = ({ children }: { children: ReactNode }) => {
     onLeftDrag(_, delta) {
       if (!isTraveler || traveler == null) return;
 
-      const n_pos: [number, number] = [
+      const left =
         traveler.idx * itemWidth +
-          (traveler.idx + 1) * gap +
-          (intermediateElement.initialWidth || 0) * (traveler.idx + 1) +
-          delta.x,
-        0,
-      ];
+        (traveler.idx + 1) * gap +
+        iternInitialWidth * (traveler.idx + 1);
+
+      const n_pos: [number, number] = [left + delta.x, 0];
 
       set({
         xy: n_pos,

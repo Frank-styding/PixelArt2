@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { ITraveler } from "./ITraveler";
 
-export const GridItemContext = createContext<{
+interface IGridItemContext {
   traveler: null | ITraveler;
   id: number;
   idx: number;
@@ -9,12 +9,9 @@ export const GridItemContext = createContext<{
   top: number;
   isTraveler: boolean;
   itemIdx: number;
-  intermediateElement: {
-    left: number;
-    top: number;
-    width: number;
-  };
-}>({
+}
+
+export const GridItemContext = createContext<IGridItemContext>({
   traveler: null,
   left: 0,
   top: 0,
@@ -22,9 +19,4 @@ export const GridItemContext = createContext<{
   id: 0,
   idx: 0,
   itemIdx: 0,
-  intermediateElement: {
-    left: 0,
-    top: 0,
-    width: 0,
-  },
 });

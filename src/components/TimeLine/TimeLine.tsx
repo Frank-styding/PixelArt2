@@ -1,11 +1,10 @@
 import styled from "styled-components";
 import { Controls } from "./Controls";
-import { GridProvider } from "../grid/GridProvider";
+import { Grid } from "../grid/Grid";
 import { ReactNode, useContext, useState } from "react";
 import { ColorPalete, Fonts } from "../../theme/Theme";
 import { GridItemContext } from "../grid/GridItemContext";
 import { GridItem } from "../grid/GridItem";
-import { useSpring, animated } from "@react-spring/web";
 import { v4 as uuid } from "uuid";
 import { swap } from "../grid/swap";
 
@@ -52,7 +51,7 @@ const LayerContainer = styled.div`
   position: relative;
 `;
 
-const StyledLayer = styled.div<{ active: boolean }>`
+const StyledLayer = styled.div<{ selected: boolean }>`
   width: 100%;
   height: 100%;
   padding: 10px 5px;
@@ -61,57 +60,16 @@ const StyledLayer = styled.div<{ active: boolean }>`
   grid-template-rows: 2fr 1fr;
   user-select: none;
   background-color: ${(porps) =>
-    porps.active ? ColorPalete.dark.dark0 : "none"};
+    porps.selected ? ColorPalete.dark.dark0 : "none"};
 `;
 
 const Layer = ({ name }: { name: string }) => {
   const { isTraveler } = useContext(GridItemContext);
   return (
-    <StyledLayer active={isTraveler}>
+    <StyledLayer selected={isTraveler}>
       <LayerPreView />
       <LayerName>{name}</LayerName>
     </StyledLayer>
-  );
-};
-
-const AddButtonContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-content: center;
-`;
-
-const AddButton = ({ onClick }: { onClick: (idx: number) => void }) => {
-  const { traveler } = useContext(GridItemContext);
-
-  const [style, set] = useSpring(() => ({
-    opacity: 0,
-    config: { duration: 100 },
-  }));
-  const { idx } = useContext(GridItemContext);
-
-  const _onClick = () => {
-    if (traveler == null) {
-      onClick(idx);
-    }
-  };
-
-  return (
-    <AddButtonContainer
-      onMouseOver={() => set({ opacity: 1 })}
-      onMouseLeave={() => set({ opacity: 0 })}
-    >
-      <animated.div
-        onClick={_onClick}
-        style={{
-          width: "30px",
-          height: "30px",
-          backgroundColor: "white",
-          borderRadius: "50%",
-          ...style,
-        }}
-      />
-    </AddButtonContainer>
   );
 };
 
@@ -142,19 +100,25 @@ const LayersContainer = () => {
 
   return (
     <StyledLayersContainer>
-      <GridProvider
-        itemWidth={240}
-        intermediateElement={{
-          element: () => <AddButton onClick={onClickAdd} />,
-          width: 25,
-          onHover: {
-            width: 35,
-            duration: 50,
-          },
-        }}
+      <Grid
         onChange={(idx, targetIdx) => {
           const n_list = swap(layers, idx, targetIdx);
           setLayers(n_list);
+        }}
+        config={{
+          intermediateElement: {
+            width: 15,
+            delay: 200,
+            addButton: {
+              onClick: (idx) => {
+                onClickAdd(idx);
+              },
+              dynamicStyle: { opacity: 0, config: { duration: 200 } },
+              onHoverDynamicStyle: { opacity: 1 },
+              onLeaveDynamicStyle: { opacity: 0 },
+            },
+            onHover: { width: 30 },
+          },
         }}
       >
         {layers.map(({ name, id }) => (
@@ -164,7 +128,7 @@ const LayersContainer = () => {
             </LayerContainer>
           </GridItem>
         ))}
-      </GridProvider>
+      </Grid>
     </StyledLayersContainer>
   );
 };
